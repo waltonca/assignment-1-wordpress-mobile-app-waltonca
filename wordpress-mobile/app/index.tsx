@@ -130,8 +130,9 @@ export default function Index() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerText}>Wave</Text>
+                <Text style={styles.headerText}>The Wave</Text>
             </View>
+            <Text style={styles.TitleText}>Title</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Article Title"
@@ -139,7 +140,7 @@ export default function Index() {
                 onChangeText={setTitle}
                 onBlur={() => Keyboard.dismiss()}
             />
-
+            <Text style={styles.ContentText}>Content</Text>
             <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder="Content"
@@ -159,7 +160,7 @@ export default function Index() {
                 )}
             </View>
 
-            <Text style={styles.label}>Category:</Text>
+            <Text style={styles.labelText}>Category:</Text>
             <RNPickerSelect
                 onValueChange={(value) => setCategory(value)}
                 items={categories.map((cat) => ({ label: cat.label, value: cat.id }))}
@@ -206,7 +207,15 @@ const styles = StyleSheet.create({
     textArea: {
         height: 100,
     },
-    label: {
+    labelText: {
+        fontSize: 16,
+        marginBottom: 8,
+    },
+    TitleText: {
+        fontSize: 16,
+        marginBottom: 8,
+    },
+    ContentText: {
         fontSize: 16,
         marginBottom: 8,
     },
