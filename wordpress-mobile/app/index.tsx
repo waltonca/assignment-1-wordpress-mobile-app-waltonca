@@ -8,6 +8,7 @@ import {
     StyleSheet,
     Image,
     Pressable,
+    Keyboard,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import * as ImagePicker from "expo-image-picker";
@@ -57,6 +58,7 @@ export default function Index() {
                 placeholder="Article Title"
                 value={title}
                 onChangeText={setTitle}
+                onBlur={() => Keyboard.dismiss()}
             />
 
             <TextInput
@@ -66,6 +68,7 @@ export default function Index() {
                 onChangeText={setContent}
                 multiline
                 numberOfLines={4}
+                onBlur={() => Keyboard.dismiss()}
             />
 
             <Pressable style={styles.button} onPress={pickImage}>
@@ -87,7 +90,7 @@ export default function Index() {
             />
 
             <Pressable style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.text}>Submit</Text>
+                <Text style={styles.text}>Publish</Text>
             </Pressable>
         </View>
     );
