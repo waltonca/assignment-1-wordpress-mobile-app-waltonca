@@ -15,7 +15,12 @@ import * as ImagePicker from "expo-image-picker";
 import base64 from "base-64";
 import utf8 from "utf8";
 
-const categories = ["Arts + Music", "Events", "Food + Drink", "Opinion"];
+const categories = [
+    { id: 2, label: "Food + Drink" },
+    { id: 3, label: "Arts + Music" },
+    { id: 4, label: "Opinion" },
+    { id: 5, label: "Events" }
+];
 const mediaApiUrl =
     "https://nscc-0304263-wp-photos-d4efduf3azg6bsbb.northcentralus-01.azurewebsites.net/wp-json/wp/v2/media";
 const postApiUrl =
@@ -77,6 +82,34 @@ export default function Index() {
         return data.id; // return media ID
     };
 
+    // Create a post with media ID
+    const createPost = async (mediaId: number) => {
+        // x-www-form-urlencoded format
+        // use URLSearchParams to create the body
+        const postData = new URLSearchParams();
+        postData.append('title', title);
+        postData.append('content', content);
+        postData.append('featured_media', mediaId.toString());
+        postData.append('categories', category.toString()); 
+        postData.append('status', 'publish');
+    
+        const response = await fetch(postApiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Basic ' + basicAuth,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: postData.toString()
+        });
+    
+        if (!response.ok) {
+            throw new Error('Post creation failed');
+        }
+    
+        const data = await response.json();
+        Alert.alert("Post created!", `Post ID: ${data.id}`);
+    };
+
     // const handlePublish = () => {
     //     const article = {
     //         title,
@@ -90,8 +123,8 @@ export default function Index() {
     // };
     const handlePublish = async () => {
         try {
-            uploadMedia(image!);
-            
+            const mediaId = await uploadMedia(image!);
+            await createPost(mediaId);
         } catch (error) {
             Alert.alert("Error", error.message);
         }
@@ -131,7 +164,7 @@ export default function Index() {
             <Text style={styles.label}>Category:</Text>
             <RNPickerSelect
                 onValueChange={(value) => setCategory(value)}
-                items={categories.map((cat) => ({ label: cat, value: cat }))}
+                items={categories.map((cat) => ({ label: cat.label, value: cat.id }))}
                 style={pickerSelectStyles}
                 value={category}
                 placeholder={{ label: "Select a category...", value: null }}
