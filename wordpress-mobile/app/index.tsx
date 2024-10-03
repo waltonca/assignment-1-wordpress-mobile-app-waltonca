@@ -7,6 +7,7 @@ import {
     FlatList,
     StyleSheet,
     Image,
+    Pressable,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import * as ImagePicker from "expo-image-picker";
@@ -35,6 +36,17 @@ export default function Index() {
         }
     };
 
+    const handleSubmit = () => {
+        const article = {
+            title,
+            content,
+            image,
+            category,
+        };
+        console.log("Submitted article:", article);
+        alert("Article submitted!", JSON.stringify(article));
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -56,11 +68,14 @@ export default function Index() {
                 numberOfLines={4}
             />
 
-            <Button
-                title="Pick an image from camera roll"
-                onPress={pickImage}
-            />
-            {image && <Image source={{ uri: image }} style={styles.image} />}
+            <Pressable style={styles.button} onPress={pickImage}>
+                <Text style={styles.text}>Pick an image</Text>
+            </Pressable>
+            <View style={styles.imageContainer}>
+                {image && (
+                    <Image source={{ uri: image }} style={styles.image} />
+                )}
+            </View>
 
             <Text style={styles.label}>Category:</Text>
             <RNPickerSelect
@@ -70,6 +85,10 @@ export default function Index() {
                 value={category}
                 placeholder={{ label: "Select a category...", value: null }}
             />
+
+            <Pressable style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.text}>Submit</Text>
+            </Pressable>
         </View>
     );
 }
@@ -100,9 +119,29 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 8,
     },
+    imageContainer: {
+        alignItems: "center",
+        paddingVertical: 10,
+    },
     image: {
         width: 200,
         height: 200,
+    },
+    button: {
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 4,
+        elevation: 3,
+        backgroundColor: "indigo",
+    },
+    text: {
+        fontSize: 16,
+        lineHeight: 21,
+        fontWeight: "bold",
+        letterSpacing: 0.25,
+        color: "white",
     },
 });
 
