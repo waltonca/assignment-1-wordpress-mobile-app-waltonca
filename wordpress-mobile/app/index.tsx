@@ -9,6 +9,8 @@ import {
     Image,
     Pressable,
     Keyboard,
+    ActivityIndicator,
+    Alert
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import * as ImagePicker from "expo-image-picker";
@@ -31,6 +33,7 @@ export default function Index() {
     const [content, setContent] = useState<string>("");
     const [category, setCategory] = useState<string>(categories[0]);
     const [image, setImage] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     // WordPress Authentication
     const username = "W0486229";
@@ -110,23 +113,18 @@ export default function Index() {
         Alert.alert("Post created!", `Post ID: ${data.id}`);
     };
 
-    // const handlePublish = () => {
-    //     const article = {
-    //         title,
-    //         content,
-    //         image,
-    //         category,
-    //     };
-    //     console.log("Published article:", article);
-    //     alert("Article published!", JSON.stringify(article));
-
-    // };
     const handlePublish = async () => {
+        setIsLoading(true); // start loading. show loading indicator
         try {
             const mediaId = await uploadMedia(image!);
             await createPost(mediaId);
+
+            // Post created successfully
+            Alert.alert('Post created!', 'Your article has been published successfully.');
         } catch (error) {
             Alert.alert("Error", error.message);
+        } finally {
+            setIsLoading(false); // stop loading. hide loading indicator
         }
     };
     return (
@@ -170,9 +168,18 @@ export default function Index() {
                 placeholder={{ label: "Select a category...", value: null }}
             />
 
-            <Pressable style={styles.button} onPress={handlePublish}>
-                <Text style={styles.text}>Publish</Text>
-            </Pressable>
+            <Pressable onPress={handlePublish} style={({ pressed }) => [{
+                backgroundColor: pressed ? '#ddd' : '#007BFF',
+                padding: 10,
+                borderRadius: 5,
+                marginBottom: 20,},]}>
+            <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>
+            {isLoading ? 'Publishing...' : 'Publish'}
+            </Text>
+        </Pressable>
+
+        {/* Show loading indicator when isLoading is true */}
+        {isLoading && <ActivityIndicator size="large" color="#007BFF" />}
         </View>
     );
 }
