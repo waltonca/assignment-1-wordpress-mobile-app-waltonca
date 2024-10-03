@@ -7,10 +7,13 @@ import {
     FlatList,
     StyleSheet,
 } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
+const categories = ["Arts + Music", "Events", "Food + Drink", "Opinion"];
 
 export default function Index() {
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
+    const [category, setCategory] = useState<string>(categories[0]);
 
     return (
         <View style={styles.container}>
@@ -31,6 +34,15 @@ export default function Index() {
                 onChangeText={setContent}
                 multiline
                 numberOfLines={4}
+            />
+
+            <Text style={styles.label}>Category:</Text>
+            <RNPickerSelect
+                onValueChange={(value) => setCategory(value)}
+                items={categories.map((cat) => ({ label: cat, value: cat }))}
+                style={pickerSelectStyles}
+                value={category}
+                placeholder={{ label: "Select a category...", value: null }}
             />
         </View>
     );
@@ -58,21 +70,29 @@ const styles = StyleSheet.create({
     textArea: {
         height: 100,
     },
-    categories: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: "#f0f0f0",
-    },
     label: {
-        fontSize: 18,
+        fontSize: 16,
+        marginBottom: 8,
+    },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        padding: 10,
+        borderColor: "gray",
+        borderWidth: 1,
+        borderRadius: 5,
+        color: "black",
         marginBottom: 10,
     },
-    picker: {
-        height: 50,
-        width: "100%",
-        marginBottom: 20,
-    },
-    selectedText: {
+    inputAndroid: {
         fontSize: 16,
+        padding: 10,
+        borderColor: "gray",
+        borderWidth: 1,
+        borderRadius: 5,
+        color: "black",
+        marginBottom: 10,
     },
 });
