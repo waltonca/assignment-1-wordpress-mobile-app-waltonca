@@ -12,14 +12,27 @@ import {
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import * as ImagePicker from "expo-image-picker";
+import base64 from "base-64";
+import utf8 from "utf8";
 
 const categories = ["Arts + Music", "Events", "Food + Drink", "Opinion"];
+const mediaApiUrl =
+    "https://nscc-0304263-wp-photos-d4efduf3azg6bsbb.northcentralus-01.azurewebsites.net/wp-json/wp/v2/media";
+const postApiUrl =
+    "https://nscc-0304263-wp-photos-d4efduf3azg6bsbb.northcentralus-01.azurewebsites.net/wp-json/wp/v2/posts";
 
 export default function Index() {
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
     const [category, setCategory] = useState<string>(categories[0]);
     const [image, setImage] = useState<string | null>(null);
+
+    // WordPress Authentication
+    const username = "W0486229";
+    const password = "F6PQ yKFH JwOb kgs3 hsyj PJma";
+    const credentials = `${username}:${password}`;
+    const bytes = utf8.encode(credentials);
+    const basicAuth = base64.encode(bytes);
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
@@ -37,17 +50,52 @@ export default function Index() {
         }
     };
 
-    const handleSubmit = () => {
-        const article = {
-            title,
-            content,
-            image,
-            category,
-        };
-        console.log("Submitted article:", article);
-        alert("Article submitted!", JSON.stringify(article));
+    // Post media and return media ID
+    const uploadMedia = async (uri: string) => {
+        const filename = uri.split("/").pop();
+        const formData = new FormData();
+
+        formData.append("file", {
+            uri,
+            name: filename,
+        } as any);
+
+        const response = await fetch(mediaApiUrl, {
+            method: "POST",
+            headers: {
+                'Authorization': 'Basic ' + basicAuth,
+                'Content-Disposition': 'formdata; filename=' + filename,
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error("Media upload failed");
+        }
+
+        const data = await response.json();
+        return data.id; // return media ID
     };
 
+    // const handlePublish = () => {
+    //     const article = {
+    //         title,
+    //         content,
+    //         image,
+    //         category,
+    //     };
+    //     console.log("Published article:", article);
+    //     alert("Article published!", JSON.stringify(article));
+
+    // };
+    const handlePublish = async () => {
+        try {
+            uploadMedia(image!);
+            
+        } catch (error) {
+            Alert.alert("Error", error.message);
+        }
+    };
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -89,7 +137,7 @@ export default function Index() {
                 placeholder={{ label: "Select a category...", value: null }}
             />
 
-            <Pressable style={styles.button} onPress={handleSubmit}>
+            <Pressable style={styles.button} onPress={handlePublish}>
                 <Text style={styles.text}>Publish</Text>
             </Pressable>
         </View>
